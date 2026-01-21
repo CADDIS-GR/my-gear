@@ -146,7 +146,10 @@
             };
 
             return (
-                <div className={`flip-card ${isFlipped ? 'flipped' : ''} ${getBrandClass(item.brand)}`}>
+                <div 
+                    className={`flip-card ${isFlipped ? 'flipped' : ''} ${getBrandClass(item.brand)}`}
+                    style={isFlipped ? { position: 'relative', zIndex: 100 } : {}}
+                >
                     <div className="flip-card-inner">
                         {/* 앞면 */}
                         <div 
