@@ -121,7 +121,16 @@
                     <div className="flip-card-inner">
                         {/* 앞면 */}
                         <div className="flip-card-front" onClick={() => setIsFlipped(!isFlipped)}>
-                            <div className="text-white text-center">
+                            {item.image && (
+                                <div className="absolute inset-0 flex items-center justify-center p-8">
+                                    <img 
+                                        src={item.image} 
+                                        alt={item.name}
+                                        className="max-w-full max-h-32 object-contain opacity-90"
+                                    />
+                                </div>
+                            )}
+                            <div className="text-white text-center relative z-10">
                                 <div className="text-xs font-semibold mb-3 opacity-80 uppercase tracking-wider">
                                     {item.category}
                                 </div>
@@ -187,7 +196,7 @@
 
             const lines = {
                 floating: [
-                    { name: 'Amplitude Infinity', spec: 'WF5F', brand: 'SA', url: 'https://scientificanglers.com/product/amplitude-textured-infinity/' },
+                    { name: 'Amplitude Infinity', spec: 'WF5F', brand: 'SA', url: 'https://scientificanglers.com/product/amplitude-textured-infinity/', image: 'https://scientificanglers.com/wp-content/uploads/2019/08/amplitude-textured-infinity-2.jpg' },
                     { name: 'Amplitude Anadro', spec: 'WF6F', brand: 'SA', url: 'https://scientificanglers.com/product/amplitude-anadro/' },
                     { name: 'Amplitude Smooth MPX', spec: 'WF4F', brand: 'SA', url: 'https://scientificanglers.com/product/amplitude-smooth-mpx/' },
                     { name: 'Xtreme Indicator', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-xtreme-indicator' },
