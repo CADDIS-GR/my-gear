@@ -148,7 +148,7 @@
             return (
                 <div 
                     className={`flip-card ${isFlipped ? 'flipped' : ''} ${getBrandClass(item.brand)}`}
-                    style={isFlipped ? { position: 'relative', zIndex: 100 } : {}}
+                    style={isFlipped ? { position: 'relative', zIndex: 999 } : { position: 'relative', zIndex: 1 }}
                 >
                     <div className="flip-card-inner">
                         {/* 앞면 */}
@@ -399,9 +399,9 @@
                         </div>
 
                         {/* Gear Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={{position: 'relative'}}>
                             {filteredData().map((item, index) => (
-                                <div key={`card-${index}`} className="relative">
+                                <div key={`card-${index}`} style={{position: 'relative', zIndex: 1}}>
                                     <FlipCard item={item} index={index} />
                                 </div>
                             ))}
