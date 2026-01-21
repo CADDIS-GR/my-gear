@@ -23,6 +23,10 @@
             z-index: 10;
         }
         
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
         .flip-card-inner {
             position: relative;
             width: 100%;
@@ -78,7 +82,8 @@
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-space-between: space-between;
+            overflow: hidden;
         }
         
         .brand-sa .flip-card-front {
