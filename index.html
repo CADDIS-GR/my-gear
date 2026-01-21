@@ -143,6 +143,8 @@
         };
 
         const Modal = ({ item, onClose }) => {
+            const [currentImageIndex, setCurrentImageIndex] = useState(0);
+            
             if (!item) return null;
 
             const getBrandClass = (brand) => {
@@ -159,17 +161,28 @@
                 return brandMap[brand] || 'brand-sa';
             };
 
+            const images = item.gallery || (item.image ? [item.image] : []);
+            const hasGallery = images.length > 0;
+
+            const nextImage = () => {
+                setCurrentImageIndex((prev) => (prev + 1) % images.length);
+            };
+
+            const prevImage = () => {
+                setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+            };
+
             return (
                 <div 
                     className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
                     onClick={onClose}
                 >
                     <div 
-                        className="modal-content bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl"
+                        className="modal-content bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className={`${getBrandClass(item.brand)} p-8 text-white relative overflow-hidden`}>
-                            {item.image && (
+                            {!hasGallery && item.image && (
                                 <div 
                                     className="absolute inset-0 opacity-15"
                                     style={{
@@ -187,6 +200,52 @@
                                 <p className="text-2xl font-medium opacity-90">{item.brand}</p>
                             </div>
                         </div>
+                        
+                        {hasGallery && (
+                            <div className="relative bg-gray-900">
+                                <img 
+                                    src={images[currentImageIndex]} 
+                                    alt={`${item.name} - ${currentImageIndex + 1}`}
+                                    className="w-full h-96 object-contain"
+                                />
+                                {images.length > 1 && (
+                                    <>
+                                        <button
+                                            onClick={prevImage}
+                                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-3 rounded-full transition"
+                                        >
+                                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onClick={nextImage}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-3 rounded-full transition"
+                                        >
+                                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                                            {images.map((_, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => setCurrentImageIndex(idx)}
+                                                    className={`w-2 h-2 rounded-full transition ${
+                                                        idx === currentImageIndex 
+                                                            ? 'bg-white' 
+                                                            : 'bg-white bg-opacity-50'
+                                                    }`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+                                            {currentImageIndex + 1} / {images.length}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
                         
                         <div className="p-8">
                             <div className="mb-6">
@@ -238,7 +297,16 @@
                     { name: 'Elite Gold Max', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-gold-max', image: 'https://farbank.com/cdn/shop/files/ELITE_MAX_PDP_2.jpg' },
                     { name: 'Elite Gold Classic', spec: 'WF5F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-rio-gold', image: 'https://farbank.com/cdn/shop/products/Product_RIO_FlyLines_Coil_EliteGold_MossGoldGray.jpg' },
                     { name: 'Elite Gold Classic', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-rio-gold', image: 'https://farbank.com/cdn/shop/products/Product_RIO_FlyLines_Coil_EliteGold_MossGoldGray.jpg' },
-                    { name: 'Premier Glacial Gold', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-premier-glacial-gold', image: 'https://farbank.com/cdn/shop/products/RIO_Coil_Freshwater_Glacial_Gold_web.jpg' },
+                    { name: 'Premier Glacial Gold', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-premier-glacial-gold', 
+                      image: 'https://farbank.com/cdn/shop/products/RIO_Coil_Freshwater_Glacial_Gold_web.jpg',
+                      gallery: [
+                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-01.jpg',
+                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-02.jpg',
+                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-03.jpg',
+                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-04.jpg',
+                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-05.jpg'
+                      ]
+                    },
                     { name: 'Elite Stillwater Floater', spec: 'WF5F', detail: '30ft Head, 185gr', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-stillwater-floater', image: 'https://farbank.com/cdn/shop/products/RIO_Coils_Stillwater_Floater_517058de-0a43-4730-90c1-d1b108990ecf.jpg' },
                     { name: 'Elite Technical Trout', spec: 'WF4F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-technical-trout', image: 'https://farbank.com/cdn/shop/products/RIO_Coil_Freshwater_Tech_Trout_web.jpg' },
                 ],
