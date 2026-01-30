@@ -3,418 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Fly Fishing Gear</title>
+    <title>낚시대장's Arsenal</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Noto Sans KR', sans-serif;
         }
-        
-        .gear-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        
-        .gear-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
         }
-        
-        .gear-card-image {
-            position: absolute;
-            inset: 0;
-            background-size: cover;
-            background-position: center;
-            opacity: 0.12;
-            transition: opacity 0.3s ease;
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
         }
-        
-        .gear-card:hover .gear-card-image {
-            opacity: 0.18;
-        }
-        
-        .brand-sa {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .brand-rio {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-        
-        .brand-sage {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-        
-        .brand-vision {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-        
-        .brand-tt {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
-        
-        .brand-scott {
-            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-        }
-        
-        .brand-hardy {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-        }
-        
-        .brand-guideline {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-        }
-        
-        .modal-backdrop {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        .modal-content {
-            animation: slideIn 0.2s ease-out;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 min-h-screen">
-    <div id="app"></div>
-
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<body class="bg-slate-50 text-slate-800 selection:bg-purple-200 selection:text-purple-900">
+    <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
 
-        const GearCard = ({ item, onClick }) => {
-            const getBrandClass = (brand) => {
-                const brandMap = {
-                    'SA': 'brand-sa',
-                    'RIO': 'brand-rio',
-                    'Sage': 'brand-sage',
-                    'Vision': 'brand-vision',
-                    'T&T': 'brand-tt',
-                    'Scott': 'brand-scott',
-                    'Hardy': 'brand-hardy',
-                    'Guideline': 'brand-guideline'
-                };
-                return brandMap[brand] || 'brand-sa';
-            };
+        // --- Icons (Inline SVGs to avoid dependency issues) ---
+        const Icon = ({ children, size = 24, className = "" }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width={size} 
+                height={size} 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className}
+            >
+                {children}
+            </svg>
+        );
 
-            return (
-                <div 
-                    className={`gear-card ${getBrandClass(item.brand)} rounded-xl p-6 shadow-lg relative overflow-hidden`}
-                    onClick={() => onClick(item)}
-                >
-                    {item.image && (
-                        <div 
-                            className="gear-card-image"
-                            style={{backgroundImage: `url(${item.image})`}}
-                        />
-                    )}
-                    
-                    <div className="relative z-10 text-white">
-                        <div className="inline-block px-3 py-1 bg-white bg-opacity-20 rounded-full text-xs font-semibold mb-3">
-                            {item.category}
-                        </div>
-                        
-                        <h3 className="text-2xl font-bold mb-2">{item.name}</h3>
-                        <p className="text-lg font-medium opacity-90 mb-4">{item.brand}</p>
-                        
-                        <div className="bg-white bg-opacity-20 rounded-lg px-4 py-3 backdrop-blur-sm">
-                            <div className="font-mono text-sm">{item.spec}</div>
-                            {item.detail && (
-                                <div className="text-xs mt-1 opacity-80">{item.detail}</div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
+        const Search = (props) => <Icon {...props}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></Icon>;
+        const X = (props) => <Icon {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></Icon>;
+        const ChevronLeft = (props) => <Icon {...props}><path d="m15 18-6-6 6-6"/></Icon>;
+        const ChevronRight = (props) => <Icon {...props}><path d="m9 18 6-6-6-6"/></Icon>;
+        const ExternalLink = (props) => <Icon {...props}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></Icon>;
+        const Waves = (props) => <Icon {...props}><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></Icon>;
+        const Anchor = (props) => <Icon {...props}><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></Icon>;
+        const Disc = (props) => <Icon {...props}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></Icon>;
+        const Ruler = (props) => <Icon {...props}><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></Icon>;
 
-        const Modal = ({ item, onClose }) => {
-            const [currentImageIndex, setCurrentImageIndex] = useState(0);
-            
-            if (!item) return null;
-
-            const getBrandClass = (brand) => {
-                const brandMap = {
-                    'SA': 'brand-sa',
-                    'RIO': 'brand-rio',
-                    'Sage': 'brand-sage',
-                    'Vision': 'brand-vision',
-                    'T&T': 'brand-tt',
-                    'Scott': 'brand-scott',
-                    'Hardy': 'brand-hardy',
-                    'Guideline': 'brand-guideline'
-                };
-                return brandMap[brand] || 'brand-sa';
-            };
-
-            const images = item.gallery || (item.image ? [item.image] : []);
-            const hasGallery = images.length > 0;
-
-            const nextImage = () => {
-                setCurrentImageIndex((prev) => (prev + 1) % images.length);
-            };
-
-            const prevImage = () => {
-                setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-            };
-
-            return (
-                <div 
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
-                    onClick={onClose}
-                >
-                    <div 
-                        className="modal-content bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className={`${getBrandClass(item.brand)} p-8 text-white relative overflow-hidden`}>
-                            {!hasGallery && item.image && (
-                                <div 
-                                    className="absolute inset-0 opacity-15"
-                                    style={{
-                                        backgroundImage: `url(${item.image})`,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center'
-                                    }}
-                                />
-                            )}
-                            <div className="relative z-10">
-                                <div className="inline-block px-4 py-1 bg-white bg-opacity-20 rounded-full text-sm font-semibold mb-3">
-                                    {item.category}
-                                </div>
-                                <h2 className="text-4xl font-bold mb-2">{item.name}</h2>
-                                <p className="text-2xl font-medium opacity-90">{item.brand}</p>
-                            </div>
-                        </div>
-                        
-                        {hasGallery && (
-                            <div className="relative bg-gray-900">
-                                <img 
-                                    src={images[currentImageIndex]} 
-                                    alt={`${item.name} - ${currentImageIndex + 1}`}
-                                    className="w-full h-96 object-contain"
-                                />
-                                {images.length > 1 && (
-                                    <>
-                                        <button
-                                            onClick={prevImage}
-                                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-3 rounded-full transition"
-                                        >
-                                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                                            </svg>
-                                        </button>
-                                        <button
-                                            onClick={nextImage}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-3 rounded-full transition"
-                                        >
-                                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                                            </svg>
-                                        </button>
-                                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                                            {images.map((_, idx) => (
-                                                <button
-                                                    key={idx}
-                                                    onClick={() => setCurrentImageIndex(idx)}
-                                                    className={`w-2 h-2 rounded-full transition ${
-                                                        idx === currentImageIndex 
-                                                            ? 'bg-white' 
-                                                            : 'bg-white bg-opacity-50'
-                                                    }`}
-                                                />
-                                            ))}
-                                        </div>
-                                        <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-                                            {currentImageIndex + 1} / {images.length}
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        )}
-                        
-                        <div className="p-8">
-                            <div className="mb-6">
-                                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Specifications</h3>
-                                <div className="bg-gray-50 rounded-lg p-4">
-                                    <div className="font-mono text-lg text-gray-800">{item.spec}</div>
-                                    {item.detail && (
-                                        <div className="text-sm text-gray-600 mt-2">{item.detail}</div>
-                                    )}
-                                </div>
-                            </div>
-                            
-                            <div className="flex gap-3">
-                                <a 
-                                    href={item.url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition flex items-center justify-center gap-2"
-                                >
-                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                    </svg>
-                                    View Product Page
-                                </a>
-                                <button
-                                    onClick={onClose}
-                                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg transition"
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
+        // --- Main Component ---
         const MyGear = () => {
             const [selectedCategory, setSelectedCategory] = useState('all');
             const [searchTerm, setSearchTerm] = useState('');
             const [selectedItem, setSelectedItem] = useState(null);
 
+            // Data consolidation
             const lines = {
                 floating: [
-                    { name: 'Amplitude Infinity', spec: 'WF5F', brand: 'SA', url: 'https://scientificanglers.com/product/amplitude-textured-infinity/', 
-                      image: 'https://scientificanglers.com/wp-content/uploads/2019/08/amplitude-textured-infinity-2.jpg',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/SA_Infinity_01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/SA_Infinity_02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/SA_Infinity_03.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/SA_Infinity_04.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/SA_Infinity_05.jpg'
-                      ]
-                    },
+                    { name: 'Amplitude Infinity', spec: 'WF5F', brand: 'SA', url: 'https://scientificanglers.com/product/amplitude-textured-infinity/', image: 'https://scientificanglers.com/wp-content/uploads/2019/08/amplitude-textured-infinity-2.jpg', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/SA_Infinity_01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/SA_Infinity_02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/SA_Infinity_03.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/SA_Infinity_04.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/SA_Infinity_05.jpg'] },
                     { name: 'Amplitude Anadro', spec: 'WF6F', brand: 'SA', url: 'https://scientificanglers.com/product/amplitude-anadro/', image: 'https://scientificanglers.com/wp-content/uploads/2017/07/AMP-Anadro.jpg' },
                     { name: 'Amplitude Smooth MPX', spec: 'WF4F', brand: 'SA', url: 'https://scientificanglers.com/product/amplitude-smooth-mpx/', image: 'https://scientificanglers.com/wp-content/uploads/2018/05/Amplitude-Smooth-MPX-1.jpg' },
-                    { name: 'Xtreme Indicator', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-xtreme-indicator', 
-                      image: 'https://farbank.com/cdn/shop/products/Product_RIO_FlyLines_Coils_Elite_Xtreme_Indicator_Orange_Moss_Yellow.jpg',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/XtreameIndicator_01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/XtreameIndicator_02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/XtreameIndicator_03.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/XtreameIndicator_04.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/XtreameIndicator_05.jpg'
-                      ]
-                    },
-                    { name: 'Elite Gold Max', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-gold-max', 
-                      image: 'https://farbank.com/cdn/shop/files/ELITE_MAX_PDP_2.jpg',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_03.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_04.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_05.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_06.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_07.jpg'
-                      ]
-                    },
-                    { name: 'Elite Gold Classic', spec: 'WF5F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-rio-gold', 
-                      image: 'https://farbank.com/cdn/shop/products/Product_RIO_FlyLines_Coil_EliteGold_MossGoldGray.jpg',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_03.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_04.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_05.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_06.jpg'
-                      ]
-                    },
+                    { name: 'Xtreme Indicator', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-xtreme-indicator', image: 'https://farbank.com/cdn/shop/products/Product_RIO_FlyLines_Coils_Elite_Xtreme_Indicator_Orange_Moss_Yellow.jpg', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/XtreameIndicator_01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/XtreameIndicator_02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/XtreameIndicator_03.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/XtreameIndicator_04.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/XtreameIndicator_05.jpg'] },
+                    { name: 'Elite Gold Max', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-gold-max', image: 'https://farbank.com/cdn/shop/files/ELITE_MAX_PDP_2.jpg', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_03.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_04.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_05.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_06.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioGoldMax_07.jpg'] },
+                    { name: 'Elite Gold Classic', spec: 'WF5F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-rio-gold', image: 'https://farbank.com/cdn/shop/products/Product_RIO_FlyLines_Coil_EliteGold_MossGoldGray.jpg', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_03.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_04.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_05.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/RioEliteGold_06.jpg'] },
                     { name: 'Elite Gold Classic', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-rio-gold', image: 'https://farbank.com/cdn/shop/products/Product_RIO_FlyLines_Coil_EliteGold_MossGoldGray.jpg' },
-                    { name: 'Premier Glacial Gold', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-premier-glacial-gold', 
-                      image: 'https://farbank.com/cdn/shop/products/RIO_Coil_Freshwater_Glacial_Gold_web.jpg',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-03.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-04.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-05.jpg'
-                      ]
-                    },
-                    { name: 'Elite Stillwater Floater', spec: 'WF5F', detail: '30ft Head, 185gr', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-stillwater-floater', 
-                      image: 'https://farbank.com/cdn/shop/products/RIO_Coils_Stillwater_Floater_517058de-0a43-4730-90c1-d1b108990ecf.jpg',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterFloater_01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterFloater_02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterFloater_03.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterFloater_04.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterFloater_05.jpg'
-                      ]
-                    },
+                    { name: 'Premier Glacial Gold', spec: 'WF6F', brand: 'RIO', url: 'https://farbank.com/products/rio-premier-glacial-gold', image: 'https://farbank.com/cdn/shop/products/RIO_Coil_Freshwater_Glacial_Gold_web.jpg', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-03.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-04.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Glacial-05.jpg'] },
+                    { name: 'Elite Stillwater Floater', spec: 'WF5F', detail: '30ft Head, 185gr', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-stillwater-floater', image: 'https://farbank.com/cdn/shop/products/RIO_Coils_Stillwater_Floater_517058de-0a43-4730-90c1-d1b108990ecf.jpg', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterFloater_01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterFloater_02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterFloater_03.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterFloater_04.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterFloater_05.jpg'] },
                     { name: 'Elite Technical Trout', spec: 'WF4F', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-technical-trout', image: 'https://farbank.com/cdn/shop/products/RIO_Coil_Freshwater_Tech_Trout_web.jpg' },
                 ],
                 hybrid: [
-                    { name: 'Sonar Stillwater Clear Emerger Tip', spec: 'WF-6-F/I', brand: 'SA', url: 'https://scientificanglers.com/product/sonar-stillwater-emerger-tip/', 
-                      image: 'https://scientificanglers.com/wp-content/uploads/2017/07/Sonar-Stillwater-Midge-Tip.jpg',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_03.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_04.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_05.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_06.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_07.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_08.jpg'
-                      ]
-                    },
+                    { name: 'Sonar Stillwater Clear Emerger Tip', spec: 'WF-6-F/I', brand: 'SA', url: 'https://scientificanglers.com/product/sonar-stillwater-emerger-tip/', image: 'https://scientificanglers.com/wp-content/uploads/2017/07/Sonar-Stillwater-Midge-Tip.jpg', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_03.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_04.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_05.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_06.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_07.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/ClearEmerger_08.jpg'] },
                 ],
                 sinking: [
-                    { name: '24ft Sink Tip', spec: 'Sink4, 150gr, 5wt', brand: 'RIO', url: 'https://farbank.com/products/rio-premier-24ft-sink-tip',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Rio24ftSinkTip_01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Rio24ftSinkTip_02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Rio24ftSinkTip_03.jpg'
-                      ]
-                    },
+                    { name: '24ft Sink Tip', spec: 'Sink4, 150gr, 5wt', brand: 'RIO', url: 'https://farbank.com/products/rio-premier-24ft-sink-tip', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Rio24ftSinkTip_01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Rio24ftSinkTip_02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Rio24ftSinkTip_03.jpg'] },
                     { name: '15ft Sink Tip', spec: 'WF5F/S3, 140gr', brand: 'RIO', url: 'http://www.trutta.co.kr/shop/view.php?dgname=%C7%C3%B6%F3%C0%CC%B6%F3%C0%CE&sgname=Rio&seq=2583', image: 'http://www.trutta.co.kr/shop/files/2583-1.jpg' },
-                    { name: 'Sonar Titan Sink Tip', spec: 'WF6-F/S3', brand: 'SA', url: 'https://scientificanglers.com/product/sonar-titan-sink-tip/', 
-                      image: 'https://scientificanglers.com/wp-content/uploads/2019/08/Sonar-Titan-Sink-Tip.jpg',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_03.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_04.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_05.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_06.jpg'
-                      ]
-                    },
+                    { name: 'Sonar Titan Sink Tip', spec: 'WF6-F/S3', brand: 'SA', url: 'https://scientificanglers.com/product/sonar-titan-sink-tip/', image: 'https://scientificanglers.com/wp-content/uploads/2019/08/Sonar-Titan-Sink-Tip.jpg', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_03.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_04.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_05.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/TitanSinkTip_06.jpg'] },
                     { name: 'Sub Surface Camolux', spec: 'WF5I', brand: 'RIO', url: 'https://farbank.com/products/rio-elite-camolux' },
-                    { name: 'Sonar Stillwater Hover', spec: 'WF5-H', brand: 'SA', url: 'https://tacticalflyfisher.com/products/scientific-anglers-sonar-stillwater-series-hover',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterHover_01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterHover_02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterHover_03.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterHover_04.jpg'
-                      ]
-                    },
+                    { name: 'Sonar Stillwater Hover', spec: 'WF5-H', brand: 'SA', url: 'https://tacticalflyfisher.com/products/scientific-anglers-sonar-stillwater-series-hover', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterHover_01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterHover_02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterHover_03.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/StillwaterHover_04.jpg'] },
                     { name: 'Sonar Stillwater Parabolic Sink', spec: 'WF5S', brand: 'SA', url: 'https://scientificanglers.com/product/sonar-stillwater-parabolic-sink/', image: 'https://scientificanglers.com/wp-content/uploads/2017/07/Sonar-Stillwater-Parabolic-Sink.jpg' },
                     { name: 'Sonar Titan 3D', spec: 'I/3/5 WF6S', brand: 'SA', url: 'https://scientificanglers.com/product/sonar-titan-int-sink-3-sink-5/', image: 'https://scientificanglers.com/wp-content/uploads/2019/08/Sonar-Titan-Int-Merge.jpg' },
-                    { name: 'Sonar Sink 25 Cold', spec: 'Sink 6, 6-7wt, 200gr', brand: 'SA', url: 'https://scientificanglers.com/product/sonar-sink-25-cold/', 
-                      image: 'https://scientificanglers.com/wp-content/uploads/2019/08/Sonar-Sink-25-Coldwater.jpg',
-                      gallery: [
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_01.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_02.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_03.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_04.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_05.jpg',
-                        'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_06.jpg'
-                      ]
-                    },
+                    { name: 'Sonar Sink 25 Cold', spec: 'Sink 6, 6-7wt, 200gr', brand: 'SA', url: 'https://scientificanglers.com/product/sonar-sink-25-cold/', image: 'https://scientificanglers.com/wp-content/uploads/2019/08/Sonar-Sink-25-Coldwater.jpg', gallery: ['https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_01.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_02.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_03.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_04.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_05.jpg', 'https://raw.githubusercontent.com/CADDIS-GR/my-gear/main/images/Sink25Cold_06.jpg'] },
                 ]
             };
 
@@ -442,162 +129,308 @@
             ];
 
             const allLines = [...lines.floating, ...lines.hybrid, ...lines.sinking];
-            
-            const filteredData = () => {
+
+            const getFilteredData = () => {
                 let data = [];
-                if (selectedCategory === 'all' || selectedCategory === 'lines') {
-                    data = [...data, ...allLines.map(item => ({ ...item, category: 'Line' }))];
-                }
-                if (selectedCategory === 'all' || selectedCategory === 'rods') {
-                    data = [...data, ...rods.map(item => ({ ...item, category: 'Rod' }))];
-                }
-                if (selectedCategory === 'all' || selectedCategory === 'reels') {
-                    data = [...data, ...reels.map(item => ({ ...item, category: 'Reel' }))];
-                }
-                
+                if (selectedCategory === 'all' || selectedCategory === 'lines') data = [...data, ...allLines.map(i => ({ ...i, category: 'Line', type: i.spec.includes('Sink') ? 'Sinking' : 'Floating' }))];
+                if (selectedCategory === 'all' || selectedCategory === 'rods') data = [...data, ...rods.map(i => ({ ...i, category: 'Rod' }))];
+                if (selectedCategory === 'all' || selectedCategory === 'reels') data = [...data, ...reels.map(i => ({ ...i, category: 'Reel' }))];
+
                 if (searchTerm) {
-                    data = data.filter(item => 
+                    data = data.filter(item =>
                         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         item.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         item.spec.toLowerCase().includes(searchTerm.toLowerCase())
                     );
                 }
-                
                 return data;
             };
 
             const stats = {
                 totalLines: allLines.length,
                 floating: lines.floating.length,
-                sinking: lines.sinking.length,
+                sinking: lines.sinking.length + lines.hybrid.length,
                 totalRods: rods.length,
                 totalReels: reels.length,
             };
 
             return (
-                <div className="min-h-screen p-6">
-                    <div className="max-w-7xl mx-auto">
-                        {/* Header */}
-                        <div className="mb-8">
-                            <h1 className="text-4xl font-bold text-gray-800 mb-2">My Fly Fishing Gear</h1>
-                            <p className="text-gray-600">관리형낚시터 플라이 낚시 장비 아카이브 - 카드를 클릭하면 상세정보를 볼 수 있습니다</p>
-                        </div>
+                <div className="min-h-screen">
+                    {/* Background Ambience */}
+                    <div className="fixed inset-0 pointer-events-none opacity-40 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-purple-200 via-slate-50 to-white"></div>
 
-                        {/* Stats Cards */}
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-                            <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-blue-500">
-                                <div className="text-3xl font-bold text-blue-600">{stats.totalLines}</div>
-                                <div className="text-sm text-gray-600">Total Lines</div>
-                            </div>
-                            <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-green-500">
-                                <div className="text-3xl font-bold text-green-600">{stats.floating}</div>
-                                <div className="text-sm text-gray-600">Floating</div>
-                            </div>
-                            <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-purple-500">
-                                <div className="text-3xl font-bold text-purple-600">{stats.sinking}</div>
-                                <div className="text-sm text-gray-600">Sinking/Tip</div>
-                            </div>
-                            <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-orange-500">
-                                <div className="text-3xl font-bold text-orange-600">{stats.totalRods}</div>
-                                <div className="text-sm text-gray-600">Rods</div>
-                            </div>
-                            <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-pink-500">
-                                <div className="text-3xl font-bold text-pink-600">{stats.totalReels}</div>
-                                <div className="text-sm text-gray-600">Reels</div>
-                            </div>
-                        </div>
-
-                        {/* Search and Filter */}
-                        <div className="bg-white rounded-xl p-6 shadow-md mb-6">
-                            <div className="flex flex-col md:flex-row gap-4">
-                                <div className="flex-1 relative">
-                                    <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                    <input
-                                        type="text"
-                                        placeholder="Search gear..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
+                    {/* Navbar */}
+                    <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex items-center justify-between h-16">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-gradient-to-br from-purple-500 to-violet-600 p-2 rounded-lg shadow-lg shadow-purple-500/20 text-white">
+                                        <Anchor size={20} />
+                                    </div>
+                                    <span className="text-xl font-bold tracking-tight text-slate-900">
+                                        낚시대장<span className="text-purple-600">'s</span> Arsenal
+                                    </span>
                                 </div>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => setSelectedCategory('all')}
-                                        className={`px-4 py-2 rounded-lg font-medium transition ${
-                                            selectedCategory === 'all' 
-                                                ? 'bg-blue-600 text-white' 
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                    >
-                                        All
-                                    </button>
-                                    <button
-                                        onClick={() => setSelectedCategory('lines')}
-                                        className={`px-4 py-2 rounded-lg font-medium transition ${
-                                            selectedCategory === 'lines' 
-                                                ? 'bg-blue-600 text-white' 
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                    >
-                                        Lines
-                                    </button>
-                                    <button
-                                        onClick={() => setSelectedCategory('rods')}
-                                        className={`px-4 py-2 rounded-lg font-medium transition ${
-                                            selectedCategory === 'rods' 
-                                                ? 'bg-blue-600 text-white' 
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                    >
-                                        Rods
-                                    </button>
-                                    <button
-                                        onClick={() => setSelectedCategory('reels')}
-                                        className={`px-4 py-2 rounded-lg font-medium transition ${
-                                            selectedCategory === 'reels' 
-                                                ? 'bg-blue-600 text-white' 
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                    >
-                                        Reels
-                                    </button>
+                                <div className="text-xs font-mono text-slate-400 hidden sm:block">
+                                    MANAGED RESERVOIR FLY FISHING GEAR
                                 </div>
                             </div>
                         </div>
+                    </nav>
 
-                        {/* Gear Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredData().map((item, index) => (
-                                <GearCard 
-                                    key={index} 
-                                    item={item} 
-                                    onClick={setSelectedItem}
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+                        
+                        {/* Stats Dashboard */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                            <StatCard label="Total Lines" value={stats.totalLines} icon={<Waves size={18} />} color="text-purple-500" />
+                            <StatCard label="Sinking / Tips" value={stats.sinking} icon={<Anchor size={18} />} color="text-indigo-500" />
+                            <StatCard label="Rod Collection" value={stats.totalRods} icon={<Ruler size={18} />} color="text-violet-500" />
+                            <StatCard label="Reels" value={stats.totalReels} icon={<Disc size={18} />} color="text-fuchsia-500" />
+                        </div>
+
+                        {/* Controls */}
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 bg-white/60 p-4 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+                            {/* Tabs */}
+                            <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
+                                {['all', 'lines', 'rods', 'reels'].map((cat) => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setSelectedCategory(cat)}
+                                        className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 capitalize whitespace-nowrap ${
+                                            selectedCategory === cat
+                                                ? 'bg-white text-purple-700 shadow-sm ring-1 ring-slate-200'
+                                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                                        }`}
+                                    >
+                                        {cat}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Search */}
+                            <div className="relative w-full md:w-80 group">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-purple-500 transition-colors">
+                                    <Search size={18} />
+                                </span>
+                                <input
+                                    type="text"
+                                    placeholder="Search by brand, name, spec..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all shadow-sm"
                                 />
+                            </div>
+                        </div>
+
+                        {/* Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {getFilteredData().map((item, idx) => (
+                                <GearCard key={idx} item={item} onClick={() => setSelectedItem(item)} />
                             ))}
                         </div>
 
-                        {filteredData().length === 0 && (
-                            <div className="text-center py-12 text-gray-500">
-                                No gear found matching your search.
+                        {getFilteredData().length === 0 && (
+                            <div className="text-center py-20">
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4 text-slate-300">
+                                    <Search size={32} />
+                                </div>
+                                <h3 className="text-lg font-medium text-slate-700">No gear found</h3>
+                                <p className="text-slate-400 mt-2">Try adjusting your search or filters</p>
                             </div>
                         )}
-
-                        {/* Footer */}
-                        <div className="mt-12 text-center text-gray-500 text-sm">
-                            <p>🎣 저수지 플라이 낚시 장비 컬렉션</p>
-                            <p className="mt-1">Last updated: January 2026</p>
-                        </div>
                     </div>
-                    
+
                     {/* Modal */}
-                    <Modal item={selectedItem} onClose={() => setSelectedItem(null)} />
+                    {selectedItem && (
+                        <DetailModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+                    )}
                 </div>
             );
         };
 
-        const root = ReactDOM.createRoot(document.getElementById('app'));
+        // Sub-components
+        const StatCard = ({ label, value, icon, color }) => (
+            <div className="bg-white/80 border border-slate-200/60 p-5 rounded-2xl hover:bg-white transition-all shadow-sm hover:shadow-md cursor-default group">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">{label}</span>
+                    <span className={`${color} bg-slate-50 p-1.5 rounded-lg group-hover:scale-110 transition-transform`}>{icon}</span>
+                </div>
+                <div className="text-3xl font-bold text-slate-800 tracking-tight">{value}</div>
+            </div>
+        );
+
+        const GearCard = ({ item, onClick }) => {
+            const hasImage = item.image || (item.gallery && item.gallery.length > 0);
+            const displayImage = item.image || (item.gallery ? item.gallery[0] : null);
+
+            return (
+                <div 
+                    onClick={onClick}
+                    className="group bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-pointer hover:border-purple-300 hover:shadow-xl hover:shadow-purple-100/50 transition-all duration-300 transform hover:-translate-y-1 relative"
+                >
+                    {/* Subtle Purple Tint Overlay on Hover */}
+                    <div className="absolute inset-0 bg-purple-50/0 group-hover:bg-purple-50/30 transition-colors pointer-events-none z-0"></div>
+
+                    {/* Image Area */}
+                    <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden z-10">
+                        {hasImage ? (
+                            <img 
+                                src={displayImage} 
+                                alt={item.name} 
+                                className="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-slate-50 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px]">
+                                <span className="text-slate-400 font-mono text-xs border border-slate-300 px-2 py-1 rounded bg-white/50">NO IMAGE</span>
+                            </div>
+                        )}
+                        <div className="absolute top-3 left-3">
+                            <span className="bg-white/90 backdrop-blur text-slate-700 text-[10px] font-bold px-2 py-1 rounded-md border border-slate-200 uppercase tracking-wide shadow-sm">
+                                {item.brand}
+                            </span>
+                        </div>
+                        {item.category === 'Line' && item.spec.includes('Sink') && (
+                            <div className="absolute top-3 right-3">
+                                <span className="bg-slate-800/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg border border-slate-700">
+                                    SINK
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Content Area */}
+                    <div className="p-4 z-10 relative">
+                        <div className="flex justify-between items-start mb-1.5">
+                            <h3 className="text-base font-bold text-slate-800 leading-tight group-hover:text-purple-700 transition-colors line-clamp-2">
+                                {item.name}
+                            </h3>
+                        </div>
+                        <p className="text-xs font-mono text-purple-600/80 mb-3 border-b border-slate-100 pb-2 inline-block font-semibold">
+                            {item.spec}
+                        </p>
+                        
+                        <div className="flex items-center justify-between mt-auto">
+                            <span className="text-[10px] text-slate-500 font-medium px-2 py-1 bg-slate-100 rounded-md uppercase tracking-wider">
+                                {item.category}
+                            </span>
+                            {item.detail && (
+                                <span className="text-[10px] text-slate-400 line-clamp-1 max-w-[60%] text-right">{item.detail}</span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const DetailModal = ({ item, onClose }) => {
+            const images = item.gallery || (item.image ? [item.image] : []);
+            const [currentIdx, setCurrentIdx] = useState(0);
+
+            useEffect(() => setCurrentIdx(0), [item]);
+
+            const nextImg = (e) => {
+                e.stopPropagation();
+                setCurrentIdx((prev) => (prev + 1) % images.length);
+            };
+
+            const prevImg = (e) => {
+                e.stopPropagation();
+                setCurrentIdx((prev) => (prev - 1 + images.length) % images.length);
+            };
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" onClick={onClose}>
+                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" />
+                    
+                    <div 
+                        className="relative bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl shadow-purple-900/10 flex flex-col md:flex-row"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <button 
+                            onClick={onClose}
+                            className="absolute top-4 right-4 z-50 p-2 bg-white/50 hover:bg-white text-slate-700 rounded-full transition-colors backdrop-blur-md shadow-sm"
+                        >
+                            <X size={20} />
+                        </button>
+
+                        {/* Gallery Section */}
+                        <div className="w-full md:w-3/5 bg-slate-50 relative flex items-center justify-center bg-[radial-gradient(circle_at_center,_#f1f5f9_0%,_#e2e8f0_100%)] min-h-[300px] md:min-h-[500px]">
+                            {images.length > 0 ? (
+                                <>
+                                    <img 
+                                        src={images[currentIdx]} 
+                                        alt="Product detail" 
+                                        className="max-h-full max-w-full object-contain p-8 transition-all duration-300 mix-blend-multiply"
+                                    />
+                                    {images.length > 1 && (
+                                        <>
+                                            <button onClick={prevImg} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 text-slate-700 rounded-full hover:bg-purple-100 hover:text-purple-600 transition-colors shadow-sm border border-slate-200">
+                                                <ChevronLeft size={20} />
+                                            </button>
+                                            <button onClick={nextImg} className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 text-slate-700 rounded-full hover:bg-purple-100 hover:text-purple-600 transition-colors shadow-sm border border-slate-200">
+                                                <ChevronRight size={20} />
+                                            </button>
+                                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 p-2 bg-white/50 rounded-full backdrop-blur-sm border border-white/50">
+                                                {images.map((_, i) => (
+                                                    <div 
+                                                        key={i} 
+                                                        className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentIdx ? 'bg-purple-500 w-3' : 'bg-slate-300'}`} 
+                                                    />
+                                                ))}
+                                            </div>
+                                        </>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="text-slate-400 flex flex-col items-center">
+                                    <Anchor size={48} className="mb-2 opacity-20" />
+                                    <span className="font-mono text-sm">NO VISUALS AVAILABLE</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Details Section */}
+                        <div className="w-full md:w-2/5 p-8 overflow-y-auto bg-white relative">
+                            <div className="mb-6">
+                                <span className="inline-block px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-bold tracking-wider mb-4 border border-purple-100">
+                                    {item.brand} • {item.category}
+                                </span>
+                                <h2 className="text-3xl font-bold text-slate-800 mb-2 leading-tight">{item.name}</h2>
+                                <div className="h-1 w-20 bg-gradient-to-r from-purple-400 to-violet-500 rounded-full mb-6"></div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                                    <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Specifications</h3>
+                                    <p className="font-mono text-xl text-slate-800">{item.spec}</p>
+                                    {item.detail && (
+                                        <p className="text-sm text-slate-500 mt-2 border-t border-slate-200 pt-2">{item.detail}</p>
+                                    )}
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <a 
+                                        href={item.url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-purple-200 group"
+                                    >
+                                        <span>Product Page</span>
+                                        <ExternalLink size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                    </a>
+                                </div>
+                                
+                                <div className="mt-8 pt-6 border-t border-slate-100 text-xs text-slate-400 text-center italic">
+                                    "Perfect for the stillwater challenge."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<MyGear />);
     </script>
 </body>
